@@ -3,8 +3,6 @@
  * Immutable: all operations return a new instance.
  */
 
-//  TODO - You need to export your class to use it
-
 class Duration {
   /**
    * Total duration in seconds.
@@ -18,7 +16,7 @@ class Duration {
    * @param {number} [seconds=0] - The number of seconds.
    */
   constructor(seconds = 0) {
-     // YOUR CODE
+    this._totalSeconds = seconds;
   }
 
   /**
@@ -28,7 +26,7 @@ class Duration {
    * @returns {Duration} A new Duration instance.
    */
   static fromMinutesAndSeconds(minutes = 0, seconds = 0) {
-     // YOUR CODE
+    return new Duration(minutes * 60 + seconds);
   }
 
   /**
@@ -37,12 +35,16 @@ class Duration {
    * @returns {Duration} A new Duration representing the sum.
    */
   plus = (other) => {
-         // YOUR CODE
+    return new Duration(this._totalSeconds + other._totalSeconds);
   };
 
-  // YOUR COMMENT
+  /**
+   * Returns a new Duration by subtracting another duration.
+   * @param {Duration} other - Another duration to subtract.
+   * @returns {Duration} A new Duration representing the difference.
+   */
   minus = (other) => {
-         // YOUR CODE
+    return new Duration(this._totalSeconds - other._totalSeconds);
   };
 
   /**
@@ -50,6 +52,10 @@ class Duration {
    * @returns {string} The formatted duration string.
    */
   toString = () => {
-        // YOUR CODE
+    const minutes = Math.floor(this._totalSeconds / 60);
+    const seconds = this._totalSeconds % 60;
+    return `${minutes}m ${seconds}s`;
   };
 }
+
+export default Duration;

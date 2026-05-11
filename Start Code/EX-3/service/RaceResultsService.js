@@ -1,4 +1,5 @@
 
+import fs from 'fs';
 import { Duration } from "../model/Duration.js";
 import { RaceResult } from "../model/RaceResult.js";
 
@@ -19,10 +20,10 @@ export class RaceResultsService {
 
   /**
    * Adds a new race result to the race list.
-   * @param {RaceResult} result - The prace result.
+   * @param {RaceResult} result - The race result.
    */
   addRaceResult(result) {
-    // TODO
+    this._raceResults.push(result);
   }
 
   /**
@@ -30,7 +31,12 @@ export class RaceResultsService {
    * @param {string} filePath - The path to the file where data should be saved.
    */
   saveToFile(filePath) {
-    // TODO
+    try {
+      const data = JSON.stringify(this._raceResults);
+      fs.writeFileSync(filePath, data, 'utf8');
+    } catch (error) {
+      console.error('Error saving to file:', error);
+    }
   }
 
   /**
@@ -39,7 +45,17 @@ export class RaceResultsService {
    * @returns {boolean} True if loading was successful, false otherwise.
    */
   loadFromFile(filePath) {
-    // TODO
+    try {
+      const data = fs.readFileSync(filePath, 'utf8');
+      const parsedData = JSON.parse(data);
+      this._raceResults = parsedData.map(item => 
+        new RaceResult(item._participantId, item._sport, new Duration(item._duration._totalSeconds))
+      );
+      return true;
+    } catch (error) {
+      console.error('Error loading from file:', error);
+      return false;
+    }
   }
 
   /**
@@ -49,15 +65,17 @@ export class RaceResultsService {
    * @returns {Duration|null} Duration if found, else null.
    */
   getTimeForParticipant(participantId, sport) {
-       // TODO
+    const result = this._raceResults.find(r => r.participantId === participantId && r.sport === sport);
+    return result ? result.duration : null;
   }
 
   /**
    * Computes the total time for a given participant by summing their race times.
    * @param {string} participantId - The ID of the participant.
-   * @returns {Duration|null} The total Duration object if found, otherwise null.
+   * @returns {Duration} The total Duration object. Returns Duration of 0 seconds if no races found.
    */
   getTotalTimeForParticipant(participantId) {
-        // TODO
+    const participantResults = this._raceResults.filter(r => r.participantId === participantId);
+    return participantResults.reduce((total, result) => total.plus(result.duration), new Duration(0));
   }
 }
